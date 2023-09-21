@@ -19,18 +19,14 @@ class AlarmViewModel(
     private val triggerUpdate = MutableStateFlow(Unit)
     private val _alarms = combine(triggerUpdate, dao.getAlarms()) { _, alarmEntities ->
         alarmEntities.map { it.toAlarm() }
-    }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            emptyList()
-        )
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(), emptyList()
+    )
 
     private val _state = MutableStateFlow(AlarmState())
-    val state = combine(_state,_alarms) {state, alarms ->
+    val state = combine(_state, _alarms) { state, alarms ->
         state.copy(
             alarms = alarms.map { it.toAlarmEntity() },
-
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AlarmState())
 
@@ -52,14 +48,16 @@ class AlarmViewModel(
                 }
             }
 
-            is AlarmEvent.SaveAlarm->{
+            is AlarmEvent.SaveAlarm -> {
 
                 viewModelScope.launch {
                     val currentMaxId = dao.getMaxAlarmId() ?: 0
                     val newAlarmId = currentMaxId + 1
                     val alarm = Alarm(
                         id = newAlarmId,
-                        timeInMillis = _state.value.date.toLong(),
+                        alarmHour = _state.value.hour,
+                        alarmMinute = _state.value.minute,
+                        is24H = _state.value.is24H,
                         label = "School Alarm",
                         isActive = true
                     )
@@ -67,14 +65,43 @@ class AlarmViewModel(
 
                 }
 
-                _state.update { it.copy(
-                    isAddingAlarm = false
-                ) }
+                _state.update {
+                    it.copy(
+                        isAddingAlarm = false
+                    )
+                }
             }
-            is AlarmEvent.SetAlarmDate->{
-                _state.update { it.copy(
-                    date = event.date
-                ) }
+
+            is AlarmEvent.SetAlarmDate -> {
+                _state.update {
+                    it.copy(
+                        date = event.date
+                    )
+                }
+            }
+
+            is AlarmEvent.SetAlarmHour -> {
+                _state.update {
+                    it.copy(
+                        hour = event.hour
+                    )
+                }
+            }
+
+            is AlarmEvent.SetAlarmMinute -> {
+                _state.update {
+                    it.copy(
+                        minute = event.minute
+                    )
+                }
+            }
+
+            is AlarmEvent.SetAlarmIs24H -> {
+                _state.update {
+                    it.copy(
+                        is24H = event.is24H
+                    )
+                }
             }
         }
     }

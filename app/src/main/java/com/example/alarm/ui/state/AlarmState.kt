@@ -6,6 +6,9 @@ import com.example.alarm.data.models.Alarm
 data class AlarmState(
     val alarms: List<AlarmEntity> = emptyList(),
     val date: String = "",
+    val hour : Int = 0,
+    val minute: Int =0,
+    val is24H: Boolean = false,
     val isAddingAlarm: Boolean = false
 ){
     fun toAlarms() : List<Alarm>{

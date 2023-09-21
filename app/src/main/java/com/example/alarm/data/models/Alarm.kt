@@ -7,15 +7,20 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Alarm(
     val id: Int,
-    val timeInMillis: Long,
+    val alarmHour: Int,
+    val alarmMinute: Int,
+    val is24H: Boolean,
     val label: String,
     val isActive: Boolean,
 ) : Parcelable {
     fun toAlarmEntity(): AlarmEntity {
         return AlarmEntity(
-            id=id,
-            timeInMillis =  timeInMillis,
-            label=  label,
-            isActive = isActive)
+            id = id,
+            alarmHour = alarmHour,
+            alarmMinute = alarmMinute,
+            is24H = is24H,
+            label = label,
+            isActive = isActive
+        )
     }
 }

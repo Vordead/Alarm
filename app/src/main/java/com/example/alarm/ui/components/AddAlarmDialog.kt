@@ -48,7 +48,12 @@ fun AddAlarmDialog(
                 Spacer(modifier = Modifier.height(24.dp))
                 TimePicker(state = timePickerState)
                 TextButton(
-                    onClick = {onEvent(AlarmEvent.HideDialog)},
+                    onClick = {
+                        onEvent(AlarmEvent.SetAlarmHour(timePickerState.hour))
+                        onEvent(AlarmEvent.SetAlarmMinute(timePickerState.minute))
+                        onEvent(AlarmEvent.SetAlarmIs24H(timePickerState.is24hour))
+                        onEvent(AlarmEvent.SaveAlarm)
+                              },
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(text = "Confirm")
