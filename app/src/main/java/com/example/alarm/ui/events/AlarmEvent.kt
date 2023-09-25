@@ -3,7 +3,7 @@ package com.example.alarm.ui.events
 import com.example.alarm.data.models.Alarm
 
 sealed interface AlarmEvent {
-    object AddAlarm : AlarmEvent
+    data class SaveAlarm(val alarm: Alarm?=null) : AlarmEvent
     data class DeleteAlarm(val alarm: Alarm) : AlarmEvent
     object ShowDialog : AlarmEvent
     object HideDialog : AlarmEvent

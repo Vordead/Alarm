@@ -70,7 +70,7 @@ fun AddAlarmDialogDemo(
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     Button(onClick = {
-                        onEvent(AlarmEvent.AddAlarm)
+                        onEvent(AlarmEvent.SaveAlarm())
                     }) {
                         Text(text = "Save")
                     }

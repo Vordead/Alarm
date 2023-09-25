@@ -63,7 +63,6 @@ fun AlarmsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(state.alarms) { alarm ->
-
                 val isActiveState = remember { mutableStateOf(alarm.isActive) }
 
                 Row(
@@ -91,7 +90,8 @@ fun AlarmsScreen(
                         IconButton(onClick = {
                             isActiveState.value = !isActiveState.value
                             onEvent(AlarmEvent.SetAlarmIsActive(isActiveState.value))
-                            Log.d("mh","isAlarm active: ${isActiveState.value}")
+                            onEvent(AlarmEvent.SaveAlarm(alarm.toAlarm()))
+                            Log.d("mh",state.alarms.toString())
                         }
                         ) {
                             Icon(
@@ -105,6 +105,7 @@ fun AlarmsScreen(
                         }
                         IconButton(onClick = {
                             onEvent(AlarmEvent.DeleteAlarm(alarm.toAlarm()))
+                            Log.d("mh",state.alarms.toString())
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,

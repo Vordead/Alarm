@@ -20,4 +20,8 @@ interface AlarmDao {
     fun getAlarms() : Flow<List<AlarmEntity>>
 
     @Query("SELECT MAX(id) FROM alarmentity")
-    suspend fun getMaxAlarmId(): Int?}
+    suspend fun getMaxAlarmId(): Int?
+
+    @Query("SELECT * FROM alarmentity WHERE alarmHour = :hour AND alarmMinute = :minute AND is24H = :is24H")
+    suspend fun getAlarm(hour: Int, minute: Int, is24H: Boolean): AlarmEntity?
+}

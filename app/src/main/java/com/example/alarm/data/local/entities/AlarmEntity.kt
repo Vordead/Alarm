@@ -6,7 +6,7 @@ import com.example.alarm.data.models.Alarm
 
 @Entity
 data class AlarmEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val alarmHour: Int,
     val alarmMinute: Int,
     val is24H: Boolean,

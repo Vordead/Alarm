@@ -3,7 +3,7 @@ package com.example.alarm.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alarm.data.local.dao.AlarmDao
-import com.example.alarm.data.models.Alarm
+import com.example.alarm.data.local.entities.AlarmEntity
 import com.example.alarm.ui.events.AlarmEvent
 import com.example.alarm.ui.state.AlarmState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,21 +48,32 @@ class AlarmViewModel(
                 }
             }
 
-            is AlarmEvent.AddAlarm -> {
-
+            is AlarmEvent.SaveAlarm -> {
                 viewModelScope.launch {
-                    val currentMaxId = dao.getMaxAlarmId() ?: 0
-                    val newAlarmId = currentMaxId + 1
-                    val alarm = Alarm(
-                        id = newAlarmId,
-                        alarmHour = _state.value.hour,
-                        alarmMinute = _state.value.minute,
-                        is24H = _state.value.is24H,
-                        label = "School Alarm",
-                        isActive = true
-                    )
-                    dao.upsertAlarm(alarm.toAlarmEntity())
-
+                    if(event.alarm != null){
+                        _state.update {
+                            it.copy(isActive = _state.value.isActive)
+                        }
+                        val alarmEntity = AlarmEntity(
+                            id=event.alarm.id,
+                            alarmHour = _state.value.hour,
+                            alarmMinute = _state.value.minute,
+                            is24H = _state.value.is24H,
+                            isActive = _state.value.isActive,
+                            label = "School Alarm"
+                        )
+                        dao.upsertAlarm(alarmEntity)
+                    }
+                    else{
+                        val alarmEntity = AlarmEntity(
+                            alarmHour = _state.value.hour,
+                            alarmMinute = _state.value.minute,
+                            is24H = _state.value.is24H,
+                            isActive = _state.value.isActive,
+                            label = "School Alarm"
+                        )
+                        dao.upsertAlarm(alarmEntity)
+                    }
                 }
 
                 _state.update {
