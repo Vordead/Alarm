@@ -53,9 +53,9 @@ class AlarmViewModel(
                     val currentState = _state.value
                     val alarmEntity = AlarmEntity(
                         id = event.alarm?.id ?: 0,
-                        alarmHour = currentState.hour,
-                        alarmMinute = currentState.minute,
-                        is24H = currentState.is24H,
+                        alarmHour = if(event.alarm != null) event.alarm.alarmHour else currentState.hour,
+                        alarmMinute = if(event.alarm != null) event.alarm.alarmMinute else currentState.minute,
+                        is24H = if(event.alarm != null) event.alarm.is24H else currentState.is24H,
                         isActive = currentState.isActive,
                         label = "School Alarm"
                     )
