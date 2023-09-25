@@ -51,11 +51,13 @@ class AlarmViewModel(
             is AlarmEvent.SaveAlarm -> {
                 viewModelScope.launch {
                     val currentState = _state.value
+                    val alarmToUpdate = event.alarm
+
                     val alarmEntity = AlarmEntity(
-                        id = event.alarm?.id ?: 0,
-                        alarmHour = if(event.alarm != null) event.alarm.alarmHour else currentState.hour,
-                        alarmMinute = if(event.alarm != null) event.alarm.alarmMinute else currentState.minute,
-                        is24H = if(event.alarm != null) event.alarm.is24H else currentState.is24H,
+                        id = alarmToUpdate?.id ?: 0,
+                        alarmHour = alarmToUpdate?.alarmHour ?: currentState.hour,
+                        alarmMinute = alarmToUpdate?.alarmMinute ?: currentState.minute,
+                        is24H = alarmToUpdate?.is24H ?: currentState.is24H,
                         isActive = currentState.isActive,
                         label = "School Alarm"
                     )
@@ -67,6 +69,7 @@ class AlarmViewModel(
                     }
                 }
             }
+
 
             is AlarmEvent.SetAlarmIsActive->{
                 _state.update {
