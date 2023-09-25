@@ -52,7 +52,7 @@ fun AddAlarmDialog(
                         onEvent(AlarmEvent.SetAlarmHour(timePickerState.hour))
                         onEvent(AlarmEvent.SetAlarmMinute(timePickerState.minute))
                         onEvent(AlarmEvent.SetAlarmIs24H(timePickerState.is24hour))
-                        onEvent(AlarmEvent.SaveAlarm)
+                        onEvent(AlarmEvent.AddAlarm)
                               },
                     modifier = Modifier.align(Alignment.End)
                 ) {

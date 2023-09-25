@@ -48,7 +48,7 @@ class AlarmViewModel(
                 }
             }
 
-            is AlarmEvent.SaveAlarm -> {
+            is AlarmEvent.AddAlarm -> {
 
                 viewModelScope.launch {
                     val currentMaxId = dao.getMaxAlarmId() ?: 0
@@ -71,6 +71,16 @@ class AlarmViewModel(
                     )
                 }
             }
+
+            is AlarmEvent.SetAlarmIsActive->{
+                _state.update {
+                    it.copy(
+                        isActive = event.isActive
+                    )
+                }
+            }
+
+
 
             is AlarmEvent.SetAlarmDate -> {
                 _state.update {

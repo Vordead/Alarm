@@ -11,7 +11,7 @@ data class AlarmEntity(
     val alarmMinute: Int,
     val is24H: Boolean,
     val label: String,
-    val isActive: Boolean) {
+    var isActive: Boolean) {
     fun toAlarm(): Alarm {
         return Alarm(
             id, alarmHour, alarmMinute, is24H, label, isActive

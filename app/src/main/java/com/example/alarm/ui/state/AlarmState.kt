@@ -9,7 +9,8 @@ data class AlarmState(
     val hour : Int = 0,
     val minute: Int =0,
     val is24H: Boolean = false,
-    val isAddingAlarm: Boolean = false
+    val isAddingAlarm: Boolean = false,
+    val isActive: Boolean = false
 ){
     fun toAlarms() : List<Alarm>{
         return alarms.map {

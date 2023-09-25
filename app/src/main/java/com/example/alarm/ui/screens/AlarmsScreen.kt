@@ -1,6 +1,7 @@
 package com.example.alarm.ui.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,10 +24,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alarm.R
 import com.example.alarm.ui.components.AddAlarmDialog
 import com.example.alarm.ui.events.AlarmEvent
 import com.example.alarm.ui.state.AlarmState
@@ -58,6 +63,9 @@ fun AlarmsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(state.alarms) { alarm ->
+
+                val isActiveState = remember { mutableStateOf(alarm.isActive) }
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -79,12 +87,30 @@ fun AlarmsScreen(
                             text = "School Alarm", style = MaterialTheme.typography.titleMedium
                         )
                     }
-                    IconButton(onClick = {
-                        onEvent(AlarmEvent.DeleteAlarm(alarm.toAlarm()))
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete, contentDescription = "Delete alarm"
-                        )
+                    Row {
+                        IconButton(onClick = {
+                            isActiveState.value = !isActiveState.value
+                            onEvent(AlarmEvent.SetAlarmIsActive(isActiveState.value))
+                            Log.d("mh","isAlarm active: ${isActiveState.value}")
+                        }
+                        ) {
+                            Icon(
+                                painterResource(
+                                    id = if (isActiveState.value) R.drawable.baseline_alarm_on_24 else {
+                                        R.drawable.baseline_alarm_off_24
+                                    }
+                                ),
+                                contentDescription = null
+                            )
+                        }
+                        IconButton(onClick = {
+                            onEvent(AlarmEvent.DeleteAlarm(alarm.toAlarm()))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete alarm"
+                            )
+                        }
                     }
                 }
             }
