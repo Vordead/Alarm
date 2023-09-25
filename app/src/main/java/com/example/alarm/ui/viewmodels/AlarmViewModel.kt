@@ -50,36 +50,21 @@ class AlarmViewModel(
 
             is AlarmEvent.SaveAlarm -> {
                 viewModelScope.launch {
-                    if(event.alarm != null){
-                        _state.update {
-                            it.copy(isActive = _state.value.isActive)
-                        }
-                        val alarmEntity = AlarmEntity(
-                            id=event.alarm.id,
-                            alarmHour = _state.value.hour,
-                            alarmMinute = _state.value.minute,
-                            is24H = _state.value.is24H,
-                            isActive = _state.value.isActive,
-                            label = "School Alarm"
-                        )
-                        dao.upsertAlarm(alarmEntity)
-                    }
-                    else{
-                        val alarmEntity = AlarmEntity(
-                            alarmHour = _state.value.hour,
-                            alarmMinute = _state.value.minute,
-                            is24H = _state.value.is24H,
-                            isActive = _state.value.isActive,
-                            label = "School Alarm"
-                        )
-                        dao.upsertAlarm(alarmEntity)
-                    }
-                }
-
-                _state.update {
-                    it.copy(
-                        isAddingAlarm = false
+                    val currentState = _state.value
+                    val alarmEntity = AlarmEntity(
+                        id = event.alarm?.id ?: 0,
+                        alarmHour = currentState.hour,
+                        alarmMinute = currentState.minute,
+                        is24H = currentState.is24H,
+                        isActive = currentState.isActive,
+                        label = "School Alarm"
                     )
+
+                    dao.upsertAlarm(alarmEntity)
+
+                    _state.update {
+                        it.copy(isAddingAlarm = false)
+                    }
                 }
             }
 
