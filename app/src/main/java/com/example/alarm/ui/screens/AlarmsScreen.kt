@@ -1,7 +1,11 @@
 package com.example.alarm.ui.screens
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,11 +25,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -35,14 +42,27 @@ import com.example.alarm.R
 import com.example.alarm.ui.components.AddAlarmDialog
 import com.example.alarm.ui.events.AlarmEvent
 import com.example.alarm.ui.state.AlarmState
+import kotlinx.coroutines.launch
+import java.util.Calendar
 
+@RequiresApi(Build.VERSION_CODES.S)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlarmsScreen(
-    state: AlarmState, timePickerState: TimePickerState, onEvent: (AlarmEvent) -> Unit
+    state: AlarmState,
+    timePickerState: TimePickerState,
+    onEvent: (AlarmEvent) -> Unit,
+    alarmManager: AlarmManager,
+    pendingIntent: PendingIntent
 ) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 onEvent(AlarmEvent.ShowDialog)
@@ -57,10 +77,10 @@ fun AlarmsScreen(
             AddAlarmDialog(state = state, timePickerState = timePickerState, onEvent = onEvent)
         }
         LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(state.alarms,key = {alarm-> alarm.id}) { alarm ->
+
+            items(state.alarms, key = { alarm -> alarm.id }) { alarm ->
                 val isActiveState = remember { mutableStateOf(alarm.isActive) }
 
                 Row(
@@ -89,21 +109,35 @@ fun AlarmsScreen(
                             isActiveState.value = !isActiveState.value
                             onEvent(AlarmEvent.SetAlarmIsActive(isActiveState.value))
                             onEvent(AlarmEvent.SaveAlarm(alarm.toAlarm()))
-                            Log.d("mh",state.alarms.toString())
-                        }
-                        ) {
+                            if (isActiveState.value) {
+                                val calendar = Calendar.getInstance().apply {
+                                    timeInMillis = System.currentTimeMillis()
+                                    set(Calendar.HOUR_OF_DAY, alarm.alarmHour)
+                                    set(Calendar.MINUTE, alarm.alarmMinute)
+                                }
+
+                                alarmManager.canScheduleExactAlarms()
+                                alarmManager.setExactAndAllowWhileIdle(
+                                    AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent
+                                )
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        "Alarm set for ${alarm.alarmHour}:${alarm.alarmMinute}"
+                                    )
+                                }
+                            }
+                        }) {
                             Icon(
                                 painterResource(
                                     id = if (isActiveState.value) R.drawable.baseline_alarm_on_24 else {
                                         R.drawable.baseline_alarm_off_24
                                     }
-                                ),
-                                contentDescription = null
+                                ), contentDescription = null
                             )
                         }
                         IconButton(onClick = {
                             onEvent(AlarmEvent.DeleteAlarm(alarm.toAlarm()))
-                            Log.d("mh",state.alarms.toString())
+                            Log.d("mh", state.alarms.toString())
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
