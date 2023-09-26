@@ -56,13 +56,11 @@ fun AlarmsScreen(
         if (state.isAddingAlarm) {
             AddAlarmDialog(state = state, timePickerState = timePickerState, onEvent = onEvent)
         }
-
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(state.alarms) { alarm ->
+            items(state.alarms,key = {alarm-> alarm.id}) { alarm ->
                 val isActiveState = remember { mutableStateOf(alarm.isActive) }
 
                 Row(
